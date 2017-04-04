@@ -71,46 +71,47 @@
     Version: 17.03.1~ce-0~ubuntu-xenial
 
     $ docker build --no-cache .
-    Sending build context to Docker daemon 43.52 kB
-    Step 1/6 : FROM debian:jessie
-     ---> 8cedef9d7368
+    Sending build context to Docker daemon 60.93 kB
+    Step 1/6 : FROM busybox
+     ---> 00f017a8c2a6
     Step 2/6 : RUN mkdir -p /bar
-     ---> Running in 3d41e1175745
-     ---> f033222feed4
-    Removing intermediate container 3d41e1175745
+     ---> Running in b697b1344dcf
+     ---> 1add665dc792
+    Removing intermediate container b697b1344dcf
     Step 3/6 : RUN rm -rf /bar ; mkdir -p /bar ; touch /bar/foo
-     ---> Running in d10ab231c0a4
-     ---> 3ff579e07aad
-    Removing intermediate container d10ab231c0a4
+     ---> Running in 69a7c287d4cc
+     ---> 41579fb81843
+    Removing intermediate container 69a7c287d4cc
     Step 4/6 : RUN ls -ila /bar
-     ---> Running in a2cb035962ad
+     ---> Running in ce7c006e9ec4
     total 8
-    50 drwxr-xr-x  2 root root 4096 Apr  4 15:23 .
-     2 drwxr-xr-x 29 root root 4096 Apr  4 15:23 ..
-    63 -rw-r--r--  1 root root    0 Apr  4 15:23 foo
-     ---> 698535d52ad9
-    Removing intermediate container a2cb035962ad
+         24 drwxr-xr-x    2 root     root          4096 Apr  4 15:39 .
+          2 drwxr-xr-x   20 root     root          4096 Apr  4 15:39 ..
+         25 -rw-r--r--    1 root     root             0 Apr  4 15:39 foo
+     ---> e9be5d38d5c8
+    Removing intermediate container ce7c006e9ec4
     Step 5/6 : RUN rm -rf /bar ; ls -ila /bar ; mkdir -p /bar ; ls -ila /bar
-     ---> Running in 9f99a398bf86
-    ls: cannot access /bar: No such file or directory
+     ---> Running in 7f7e42156641
+    ls: /bar: No such file or directory
     total 8
-    52 drwxr-xr-x  2 root root 4096 Apr  4 15:23 .
-     2 drwxr-xr-x 30 root root 4096 Apr  4 15:23 ..
-     ---> efca0aab25f9
-    Removing intermediate container 9f99a398bf86
+         24 drwxr-xr-x    2 root     root          4096 Apr  4 15:39 .
+          2 drwxr-xr-x   21 root     root          4096 Apr  4 15:39 ..
+     ---> db8ac9e4739f
+    Removing intermediate container 7f7e42156641
     Step 6/6 : RUN ls -ila /bar
-     ---> Running in f8c901531d03
+     ---> Running in 7f6856647e56
     total 8
-    50 drwxr-xr-x  2 root root 4096 Apr  4 15:23 .
-     2 drwxr-xr-x 30 root root 4096 Apr  4 15:23 ..
-    63 -rw-r--r--  1 root root    0 Apr  4 15:23 foo
-     ---> 4e8dc1d4f7a5
-    Removing intermediate container f8c901531d03
-    Successfully built 4e8dc1d4f7a5
+         24 drwxr-xr-x    2 root     root          4096 Apr  4 15:39 .
+          2 drwxr-xr-x   21 root     root          4096 Apr  4 15:39 ..
+         25 -rw-r--r--    1 root     root             0 Apr  4 15:39 foo
+     ---> d92973d52280
+    Removing intermediate container 7f6856647e56
+    Successfully built d92973d52280
 
-So, why is there still a file `/bar/foo` when the previous `RUN` command did `rm -rf /bar` and `mkdir -p /bar`, and where did the `/bar` directory with inode `52` go?
+So, why is there still a file `/bar/foo` when the previous `RUN` command did `rm -rf /bar` and `mkdir -p /bar`?
 
 This doesn't happen when:
- - I split the line containing `rm -rf /bar` and `mkdir -p /bar` into 2 `RUN` commands
- - I touch the `/bar/foo` in a separate `RUN` command
- - I use `busybox` as `FROM`
+ - I don't do the first `rm -rf /bar ; mkdir -p /bar`
+ - I split the lines containing `rm -rf /bar` and `mkdir -p /bar` into 2 `RUN` commands
+
+It also happens with eg. `debian:jessie` as `FROM`

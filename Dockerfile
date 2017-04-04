@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM busybox
 RUN mkdir -p /bar
 RUN rm -rf /bar ; mkdir -p /bar ; touch /bar/foo
 RUN ls -ila /bar
